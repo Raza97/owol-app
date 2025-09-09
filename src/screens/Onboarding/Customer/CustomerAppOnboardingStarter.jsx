@@ -12,6 +12,7 @@ import Button from '../../../components/Button';
 
 const CustomerAppOnboardingStarter = () => {
     const nav = useNavigation()
+    const { roleId, roleTitle } = useRoute().params || {};
     const [steps, setSteps] = useState(0)
     const { theme, toggleTheme } = useTheme(); // Get theme state
     const ggStyles = useCustomerStyles()
@@ -50,7 +51,10 @@ const CustomerAppOnboardingStarter = () => {
                 <Image source={require('../../../../assets/images/OwOLLogo.png')} style={styles.image} />
             </View>
             <View style={{ width: width / 1.1, marginBottom: 20 }}>
-                <Button title="Let's go" onPress={() => nav.navigate('customerapponboarding')} />
+                <Button title="Let's go" onPress={() => nav.navigate('customerapponboarding', { 
+                    roleId: roleId, 
+                    roleTitle: roleTitle 
+                })} />
             </View>
             {/* <TouchableOpacity onPress={() => nav.navigate('customerapponboarding')} activeOpacity={0.9} style={[styles.button, { backgroundColor: theme == 'light' ? Colors.light.btn : Colors.dark.btn }]}>
                 <Text style={styles.buttonText}>Let's go</Text>

@@ -4,9 +4,15 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Colors } from '../../../constants/Colors';
 import { useTheme } from '../../routes/ThemeContext';
+import { useUser } from '../../contexts/UserContext';
 const EarnerHeader = () => {
     const { theme, toggleTheme } = useTheme(); // Get theme state
+    const { user } = useUser();
     const nav = useNavigation()
+    
+    // Get user's first name or fallback to "User"
+    const userName = user?.name ? user.name.split(' ')[0] : 'User';
+    
     return (
         <View style={styles.header}>
             <View style={{
@@ -18,7 +24,7 @@ const EarnerHeader = () => {
                     source={require('../../../assets/images/Avatar.png')} // Replace with user's profile image
                     style={styles.profileImage}
                 />
-                <Text style={[styles.greeting, { color: theme == 'light' ? Colors.light.text : Colors.dark.text }]}>Hi, Michael!</Text>
+                <Text style={[styles.greeting, { color: theme == 'light' ? Colors.light.text : Colors.dark.text }]}>Hi, {userName}!</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <TouchableOpacity onPress={() => nav.navigate('peopleview')}>

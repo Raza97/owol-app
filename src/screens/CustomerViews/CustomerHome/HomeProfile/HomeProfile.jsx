@@ -19,6 +19,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../../../routes/ThemeContext';
 import useCustomerStyles from '../../../../../constants/GlobalCustomerStyles';
 import { Colors } from '../../../../../constants/Colors';
+import { useUser } from '../../../../contexts/UserContext';
+import { StackActions } from '@react-navigation/native';
 const HomeProfile = () => {
 
     const { theme, toggleTheme } = useTheme(); // Get theme state
@@ -26,7 +28,30 @@ const HomeProfile = () => {
     const ggStyles = useCustomerStyles()
     const styles = getStyles(theme, ggStyles)
     const nav = useNavigation()
+    const { clearUser, user } = useUser();
     const [isCustomer, setIsCustomer] = useState(false);
+
+    // Handle logout
+    const handleLogout = () => {
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: () => {
+                        clearUser();
+                        nav.dispatch(StackActions.replace('onboarding'));
+                    },
+                },
+            ]
+        );
+    };
 
     const header = () => {
         return (
@@ -54,7 +79,7 @@ const HomeProfile = () => {
                                 style={styles.profileImage}
                             />
                             <View style={styles.headerTextContainer}>
-                                <Text style={styles.name}>Michael Rosenbaum</Text>
+                                <Text style={styles.name}>{user?.name || 'User'}</Text>
                                 <Text style={styles.title}>Head Chef</Text>
                             </View>
                             <TouchableOpacity style={styles.editButton}>
@@ -104,7 +129,7 @@ const HomeProfile = () => {
                         </TouchableOpacity>
                     </View>
                     <View style={{ marginTop: 25, marginHorizontal: 10 }}>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', }}>
+                        <TouchableOpacity onPress={handleLogout} style={{ flexDirection: 'row', alignItems: 'center', }}>
                             <MaterialIcons name='logout' color={'#ED3F2C'} size={18} />
                             <Text style={{ color: '#ED3F2C', fontSize: 15, marginLeft: 5 }}>Log out</Text>
                         </TouchableOpacity>

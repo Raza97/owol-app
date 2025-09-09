@@ -12,11 +12,13 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomBar from '../../BottomBar';
 import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../../../contexts/UserContext';
 
 
 const CustomerHome = () => {
     const nav = useNavigation()
     const [isCustomer, setIsCustomer] = useState(false);
+    const { user } = useUser();
 
     const header = () => {
         return (
@@ -43,7 +45,7 @@ const CustomerHome = () => {
                             style={styles.profileImage}
                         />
                         <View style={styles.headerTextContainer}>
-                            <Text style={styles.name}>Michael Rosenbaum</Text>
+                            <Text style={styles.name}>{user?.name || 'User'}</Text>
                             <Text style={styles.title}>Head Chef</Text>
                         </View>
                         <TouchableOpacity style={styles.editButton}>

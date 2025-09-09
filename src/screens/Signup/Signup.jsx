@@ -19,6 +19,10 @@ import useCustomerStyles from '../../../constants/GlobalCustomerStyles';
 import { useTheme } from '../../routes/ThemeContext';
 import Typhography from '../../components/Typhography';
 import Button from '../../components/Button';
+import { api } from '../../services/api';
+import ToastMessage from '../../../utlis/ToastMessage';
+import { useUser } from '../../contexts/UserContext';
+import { tokenStorage } from '../../utils/tokenStorage';
 
 const socialIcons = {
   apple: require('../../../assets/images/apple.png'),
@@ -26,15 +30,62 @@ const socialIcons = {
   facebook: require('../../../assets/images/facebook.png'),
 };
 const Signup = () => {
-    const { screen } = useRoute().params;
+    const { screen, roleId, roleTitle } = useRoute().params;
     const nav = useNavigation();
     const { theme, toggleTheme } = useTheme();
+    const { updateUser } = useUser();
     const ggStyles = useCustomerStyles();
     const styles = getStyles(theme, ggStyles);
 
     const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    // Handle signup with API
+    const handleSignup = async () => {
+        if (!userName || !email || !password) {
+            ToastMessage('error', 'top', 'Please fill in all fields');
+            return;
+        }
+
+        if (!roleId) {
+            ToastMessage('error', 'top', 'Role information missing. Please try again.');
+            return;
+        }
+
+        console.log('Signup attempt with roleId:', roleId, 'roleTitle:', roleTitle);
+
+        try {
+            setLoading(true);
+            const response = await api.signup(userName, email, password, roleId);
+            
+            // Store token first
+            tokenStorage.setToken(response.token);
+            // Then store user data
+            updateUser(response.user);
+            console.log('Signup successful, token and user data stored');
+            
+            // Navigate to onboarding starter
+            nav.navigate('onboardstarter', { 
+                selection: screen,
+                roleId: roleId,
+                roleTitle: roleTitle
+            });
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            if (error.message.includes('409')) {
+                ToastMessage('error', 'top', 'Email already exists. Please use a different email.');
+            } else if (error.message.includes('400')) {
+                ToastMessage('error', 'top', 'Invalid signup data. Please check your information.');
+            } else {
+                ToastMessage('error', 'top', 'Signup failed. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: ggStyles.basicContainer.backgroundColor }]}>
@@ -112,9 +163,10 @@ const Signup = () => {
                     </View>
 
                     <Button
-                        title="Sign up for free"
+                        title={loading ? 'Creating account...' : 'Sign up for free'}
                         style={{ width: width / 1.1 }}
-                        onPress={() => nav.navigate('onboardstarter', { selection: screen })}
+                        onPress={handleSignup}
+                        disabled={loading}
                     />
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

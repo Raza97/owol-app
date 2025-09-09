@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { UserProvider } from '../contexts/UserContext';
 import Splash from '../screens/Splash';
 import MainActivity from '../screens/Onboarding/MainActivity';
 import OnboardingStarter from '../screens/Onboarding/OnBoardingStarter';
@@ -62,8 +63,9 @@ const Stack = createNativeStackNavigator();
 
 export default function MainNavigation() {
     return (
-        <ThemeProvider>
-            <NavigationContainer>
+        <UserProvider>
+            <ThemeProvider>
+                <NavigationContainer>
                 <Stack.Navigator
                     initialRouteName="splash"
                     screenOptions={{ headerShown: false }}>
@@ -124,6 +126,7 @@ export default function MainNavigation() {
                     <Stack.Screen name="discovereventhome" component={DiscoverEventHome} />
                 </Stack.Navigator>
             </NavigationContainer>
-        </ThemeProvider>
+            </ThemeProvider>
+        </UserProvider>
     );
 }

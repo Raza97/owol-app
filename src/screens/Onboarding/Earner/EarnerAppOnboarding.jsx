@@ -18,6 +18,7 @@ const tabs = [
 
 const EarnerAppOnboarding = () => {
     const nav = useNavigation()
+    const { roleId, roleTitle } = useRoute().params || {};
     const [onboardingSteps, setOnboardingSteps] = useState(1)
     const { theme, toggleTheme } = useTheme(); // Get theme state
     const ggStyles = useCustomerStyles()
@@ -25,10 +26,14 @@ const EarnerAppOnboarding = () => {
 
     useEffect(() => {
         if (onboardingSteps > 3) {
-            nav.navigate('signup', { screen: 'earner' })
+            nav.navigate('signup', { 
+                screen: 'earner',
+                roleId: roleId,
+                roleTitle: roleTitle
+            })
             setOnboardingSteps(3)
         }
-    }, [onboardingSteps])
+    }, [onboardingSteps, roleId, roleTitle])
 
 
 

@@ -11,6 +11,7 @@ import { Colors } from '../../../constants/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Button from '../../components/Button';
 import Typhography from '../../components/Typhography';
+import { api } from '../../services/api';
 
 
 const { width, height } = Dimensions.get('window');
@@ -19,18 +20,62 @@ const OnboardingMenu = () => {
     // const {isDark, toggleTheme } = useTheme();
     const nav = useNavigation()
     const [onboardSelect, setOnboardSelect] = useState(null)
+    const [roles, setRoles] = useState([])
+    const [loading, setLoading] = useState(true)
     const { theme, toggleTheme } = useTheme(); // Get theme state
     // const stylesTheme = theme === 'light' ? lightStyles : darkStyles;
     const Styles = getStyles(theme);
 
+    // Fetch roles when component mounts
+    useEffect(() => {
+        fetchRoles();
+    }, []);
+
+    const fetchRoles = async () => {
+        try {
+            setLoading(true);
+            const rolesData = await api.getRoles();
+            console.log('Fetched roles:', rolesData);
+            setRoles(rolesData);
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+            ToastMessage('error', 'top', 'Failed to load roles. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Get role info by title (case-insensitive)
+    const getRoleInfo = (title) => {
+        const foundRole = roles.find(role => 
+            role.title.toLowerCase() === title.toLowerCase()
+        );
+        console.log(`Looking for role: ${title}, found:`, foundRole);
+        return foundRole;
+    };
+
     const handleClick = () => {
         if (onboardSelect === 'customer') {
+            const customerRole = getRoleInfo('customer') || getRoleInfo('consumer') || getRoleInfo('user');
+            if (!customerRole) {
+                ToastMessage('error', 'top', 'Customer role not found. Please try again.');
+                return;
+            }
             nav.navigate('customerapponboardstarter', {
                 selection: 'customer',
+                roleId: customerRole.id,
+                roleTitle: customerRole.title,
             });
         } else if (onboardSelect === 'earner') {
+            const earnerRole = getRoleInfo('earner');
+            if (!earnerRole) {
+                ToastMessage('error', 'top', 'Earner role not found. Please try again.');
+                return;
+            }
             nav.navigate('earnerapponboardstarter', {
                 selection: 'earner',
+                roleId: earnerRole.id,
+                roleTitle: earnerRole.title,
             });
         } else {
             ToastMessage('error', 'top', 'Please select a role to continue onboarding');
@@ -39,12 +84,26 @@ const OnboardingMenu = () => {
 
     const handleLoginClick = () => {
         if (onboardSelect === 'customer') {
+            const customerRole = getRoleInfo('customer') || getRoleInfo('consumer') || getRoleInfo('user');
+            if (!customerRole) {
+                ToastMessage('error', 'top', 'Customer role not found. Please try again.');
+                return;
+            }
             nav.navigate('login', {
                 screen: 'customer',
+                roleId: customerRole.id,
+                roleTitle: customerRole.title,
             });
         } else if (onboardSelect === 'earner') {
+            const earnerRole = getRoleInfo('earner');
+            if (!earnerRole) {
+                ToastMessage('error', 'top', 'Earner role not found. Please try again.');
+                return;
+            }
             nav.navigate('login', {
                 screen: 'earner',
+                roleId: earnerRole.id,
+                roleTitle: earnerRole.title,
             });
         } else {
             ToastMessage('error', 'top', 'Please select a role to login');
@@ -130,6 +189,16 @@ const OnboardingMenu = () => {
                 </View>
             </View >
         )
+    }
+
+    if (loading) {
+        return (
+            <SafeAreaView style={[Styles.container, { backgroundColor: theme == 'light' ? Colors.light.background : Colors.dark.background }]}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Typhography>Loading roles...</Typhography>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     return (

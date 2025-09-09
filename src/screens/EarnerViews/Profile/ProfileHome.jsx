@@ -20,11 +20,13 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../../routes/ThemeContext';
 import { Colors } from '../../../../constants/Colors';
 import useCustomerStyles from '../../../../constants/GlobalCustomerStyles';
+import { useUser } from '../../../contexts/UserContext';
 
 const ProfileHome = () => {
     const nav = useNavigation()
     const [isCustomer, setIsCustomer] = useState(false);
     const { theme, toggleTheme } = useTheme(); // Get theme state
+    const { user } = useUser();
     const ggStyles = useCustomerStyles()
     const styles = getStyles(theme, ggStyles)
     const header = () => {
@@ -51,7 +53,7 @@ const ProfileHome = () => {
                             style={styles.profileImage}
                         />
                         <View style={styles.headerTextContainer}>
-                            <Text style={styles.name}>Michael Rosenbaum</Text>
+                            <Text style={styles.name}>{user?.name || 'User'}</Text>
                             <Text style={styles.title}>Head Chef</Text>
                         </View>
                         <TouchableOpacity style={styles.editButton}>

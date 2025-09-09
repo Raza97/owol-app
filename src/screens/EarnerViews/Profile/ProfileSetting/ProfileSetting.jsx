@@ -7,7 +7,8 @@ import {
     ScrollView,
     Image,
     Switch,
-    Dimensions
+    Dimensions,
+    Alert
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,14 +16,39 @@ import { useNavigation } from '@react-navigation/native';
 import useCustomerStyles from '../../../../../constants/GlobalCustomerStyles';
 import { useTheme } from '../../../../routes/ThemeContext';
 import { Colors } from '../../../../../constants/Colors';
+import { useUser } from '../../../../contexts/UserContext';
+import { StackActions } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 
 const ProfileSetting = () => {
     const [num, setNum] = useState(1)
     const nav = useNavigation()
     const { theme, toggleTheme } = useTheme(); // Get theme state
+    const { clearUser } = useUser();
     const ggStyles = useCustomerStyles()
     const styles = getStyles(theme, ggStyles)
+
+    // Handle logout
+    const handleLogout = () => {
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: () => {
+                        clearUser();
+                        nav.dispatch(StackActions.replace('onboarding'));
+                    },
+                },
+            ]
+        );
+    };
 
     const payoutList = [
         { name: 'Homemade bread', amount: '+ $5' },
@@ -87,6 +113,15 @@ const ProfileSetting = () => {
                     <Text style={styles.settingText}>Notifications</Text>
                     <MaterialIcons name="chevron-right" size={24} color={'grey'} />
                 </TouchableOpacity>
+                
+                {/* Logout Button */}
+                <View style={{ marginTop: 25, marginHorizontal: 10 }}>
+                    <TouchableOpacity onPress={handleLogout} style={{ flexDirection: 'row', alignItems: 'center', }}>
+                        <MaterialIcons name='logout' color={'#ED3F2C'} size={18} />
+                        <Text style={{ color: '#ED3F2C', fontSize: 15, marginLeft: 5 }}>Log out</Text>
+                    </TouchableOpacity>
+                    <Text style={{ color: 'grey', fontSize: 15, marginTop: 30 }}>Version 1.0</Text>
+                </View>
             </View>
         )
     }

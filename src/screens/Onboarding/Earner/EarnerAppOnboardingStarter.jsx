@@ -12,7 +12,7 @@ import Typhography from '../../../components/Typhography';
 
 const EarnerAppOnboardingStarter = () => {
     const nav = useNavigation()
-    const { selection } = useRoute()?.params
+    const { selection, roleId, roleTitle } = useRoute()?.params
     const [steps, setSteps] = useState(0)
     const { theme, toggleTheme } = useTheme(); // Get theme state
     const ggStyles = useCustomerStyles()
@@ -53,7 +53,10 @@ const EarnerAppOnboardingStarter = () => {
                 
             </View>
             <View style={{ width: width / 1.1, marginBottom: 20 }}>
-                <Button title="Let's go" onPress={() => nav.navigate('earnerapponboarding')} />
+                <Button title="Let's go" onPress={() => nav.navigate('earnerapponboarding', { 
+                    roleId: roleId, 
+                    roleTitle: roleTitle 
+                })} />
             </View>
         </SafeAreaView>
     )

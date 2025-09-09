@@ -9,11 +9,15 @@ const { width, height } = Dimensions.get('window');
 import useCustomerStyles from '../../../constants/GlobalCustomerStyles';
 import Typhography from '../../components/Typhography';
 import Button from '../../components/Button';
+import { api } from '../../services/api';
+import ToastMessage from '../../../utlis/ToastMessage';
+import { tokenStorage } from '../../utils/tokenStorage';
+import { useUser } from '../../contexts/UserContext';
 
 
 const Login = () => {
-    const { screen } = useRoute().params
-    console.log('hh', screen)
+    const { screen, roleId, roleTitle } = useRoute().params
+    console.log('Login params:', { screen, roleId, roleTitle })
     const nav = useNavigation()
     const { theme, toggleTheme } = useTheme(); // Get theme state
     const ggStyles = useCustomerStyles()
@@ -21,6 +25,62 @@ const Login = () => {
     const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const { updateUser } = useUser();
+
+    // Handle login with API
+    const handleLogin = async () => {
+        if (!email || !password) {
+            ToastMessage('error', 'top', 'Please enter both email and password');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            console.log('Login attempt with roleId:', roleId, 'roleTitle:', roleTitle);
+            const response = await api.login(email, password, roleId);
+            console.log('Login response:', response);
+            
+            // Validate role match (only if roleTitle is provided)
+            if (roleTitle && response.user.role.toLowerCase() !== roleTitle.toLowerCase()) {
+                console.log('Role mismatch - expected:', roleTitle, 'got:', response.user.role);
+                ToastMessage('error', 'top', `This account isn't registered as ${roleTitle}.`);
+                return;
+            }
+
+            // Store token securely
+            tokenStorage.setToken(response.token);
+            // Update user context with user data
+            updateUser(response.user);
+            console.log('Login successful, token stored');
+            
+            // Navigate to appropriate screen based on user's actual role
+            if (response.user.role.toLowerCase() === 'customer' || response.user.role.toLowerCase() === 'consumer' || response.user.role.toLowerCase() === 'user') {
+                nav.navigate('customerhome');
+            } else if (response.user.role.toLowerCase() === 'earner') {
+                nav.navigate('cookbookhome');
+            } else {
+                // Fallback to screen parameter if role doesn't match expected values
+                if (screen === 'customer') {
+                    nav.navigate('customerhome');
+                } else if (screen === 'earner') {
+                    nav.navigate('cookbookhome');
+                }
+            }
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            if (error.message.includes('403')) {
+                ToastMessage('error', 'top', 'Invalid role for this account.');
+            } else if (error.message.includes('401')) {
+                ToastMessage('error', 'top', 'Invalid email or password.');
+            } else {
+                ToastMessage('error', 'top', 'Login failed. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const header = () => {
         return (
@@ -114,12 +174,12 @@ const Login = () => {
                     <Typhography style={styles.buttonText}>Log in</Typhography>
                 </TouchableOpacity> */}
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <Button title={'Log in'} style={{width: width / 1.1}} onPress={() => {
-                        if (screen === 'customer')
-                            nav.navigate('customerhome')
-                        else if (screen === 'earner')
-                            nav.navigate('cookbookhome')
-                    }}/>
+                    <Button 
+                        title={loading ? 'Logging in...' : 'Log in'} 
+                        style={{width: width / 1.1}} 
+                        onPress={handleLogin}
+                        disabled={loading}
+                    />
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <Typhography style={styles.loginText}>Don't have an account? </Typhography>

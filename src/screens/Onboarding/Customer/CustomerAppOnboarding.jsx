@@ -18,6 +18,7 @@ const tabs = [
 ];
 const CustomerAppOnboarding = () => {
     const nav = useNavigation()
+    const { roleId, roleTitle } = useRoute().params || {};
     const [onboardingSteps, setOnboardingSteps] = useState(1);
     const { theme, toggleTheme } = useTheme(); // Get theme state
     const ggStyles = useCustomerStyles()
@@ -26,10 +27,14 @@ const CustomerAppOnboarding = () => {
 
     useEffect(() => {
         if (onboardingSteps > 4) {
-            nav.navigate('signup', { screen: 'customer' })
+            nav.navigate('signup', { 
+                screen: 'customer',
+                roleId: roleId,
+                roleTitle: roleTitle
+            })
             setOnboardingSteps(4)
         }
-    }, [onboardingSteps])
+    }, [onboardingSteps, roleId, roleTitle])
 
     const handleNext = () => {
         setOnboardingSteps((prev) => {

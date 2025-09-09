@@ -12,8 +12,8 @@ import Button from '../../components/Button';
 
 const OnboardingStarter = () => {
     const nav = useNavigation()
-    const { selection } = useRoute()?.params
-    console.log(selection)
+    const { selection, roleId, roleTitle } = useRoute()?.params
+    console.log('OnboardingStarter params:', { selection, roleId, roleTitle })
     const { theme, toggleTheme } = useTheme(); // Get theme state
     const ggStyles = useCustomerStyles()
 
@@ -22,11 +22,15 @@ const OnboardingStarter = () => {
         if (selection == 'customer') {
             nav.navigate('customerOnboarding', {
                 selection: 'customer',
+                roleId: roleId,
+                roleTitle: roleTitle,
             })
         }
         else {
             nav.navigate('earnerOnboarding', {
                 selection: 'earner',
+                roleId: roleId,
+                roleTitle: roleTitle,
             })
         }
     }
