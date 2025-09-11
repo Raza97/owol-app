@@ -140,7 +140,7 @@ const Login = () => {
                 <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly' }}>
                     <TouchableOpacity style={[styles.socialButton, { backgroundColor: ggStyles.greenBg.backgroundColor }]}>
                         <Image
-                            source={require('../../../assets/images/apple.png')} // Replace with your Apple logo
+                            source={require('../../../assets/images/OwOLLogo.png')} // Apple logo placeholder
                             style={styles.socialIcon}
                         />
                     </TouchableOpacity>

@@ -235,7 +235,7 @@ const EarnerOnboarding = () => {
 
                 <TouchableOpacity style={[styles.socialButton, { backgroundColor: ggStyles.greenBg.backgroundColor }]}>
                     <Image
-                        source={require('../../../../assets/images/apple.png')} // Replace with your Apple logo
+                        source={require('../../../../assets/images/OwOLLogo.png')} // Apple logo placeholder
                         style={styles.socialIcon}
                     />
                     <Text style={styles.socialButtonText}>Continue with Apple</Text>

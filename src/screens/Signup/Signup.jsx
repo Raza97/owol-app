@@ -25,7 +25,7 @@ import { useUser } from '../../contexts/UserContext';
 import { tokenStorage } from '../../utils/tokenStorage';
 
 const socialIcons = {
-  apple: require('../../../assets/images/apple.png'),
+  apple: require('../../../assets/images/OwOLLogo.png'),
   google: require('../../../assets/images/google.png'),
   facebook: require('../../../assets/images/facebook.png'),
 };
